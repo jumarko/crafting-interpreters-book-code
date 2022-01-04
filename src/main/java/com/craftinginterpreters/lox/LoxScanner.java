@@ -61,10 +61,33 @@ class LoxScanner {
             }
             case ' ', '\r', '\t' -> {} // ignore whitespace
             case '\n' -> line++; // ignore new lines too but also increment the line counter
+            case '"' -> string();
 
             // we keep scanning even after we encounter erroneous character
             default -> Lox.error(line, "Unexpected character: " + c);
         }
+    }
+
+    /**
+     * Consumes strings - expecting that the current char is the opening double quote -
+     * until the closing double quote.
+     *
+     */
+    private void string() {
+        while (peek() != '"' && !isAtEnd()) {
+            // Notice how annoying and error-prone is this new line handling.
+            // The logic is spread all over the place and it's easy to forget
+            if (peek() == '\n') line++;
+            advance();
+        }
+
+        // we are at end but there was no closing quote
+        if (isAtEnd()) {
+            Lox.error(line, "Unterminated string");
+            return;
+        }
+
+        advance(); // consume the closing quote
     }
 
     /**
