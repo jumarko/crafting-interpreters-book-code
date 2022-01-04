@@ -43,7 +43,25 @@ class LoxScanner {
             case '+' -> addToken(TokenType.PLUS);
             case ';' -> addToken(TokenType.SEMICOLON);
             case '*' -> addToken(TokenType.STAR);
+            case '!' -> addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
+            case '=' -> addToken(match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
+            case '<' -> addToken(match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
+            case '>' -> addToken(match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+            // we keep scanning even after we encounter erroneous character
+            default -> Lox.error(line, "Unexpected character: " + c);
         }
+    }
+
+    /**
+     * `match` is like a conditional `advance` - it only consumes the current character if it's
+     * what we are looking for.
+     */
+    private boolean match(char expected) {
+        if (isAtEnd()) return false;
+        if (source.charAt(current) != expected) return false;
+
+        current++;
+        return true;
     }
 
     private char advance() {

@@ -61,10 +61,13 @@ public class Lox {
 
     static void error(int line, String message) {
         report(line, "", message);
+        hadError = true;
     }
 
     private static void report(int line, String where, String message) {
 //        System.err.println("[line " + line + "] Error" + where + ": " + message);
         System.err.printf("[line %s] Error%s: %s%n", line, where, message);
+        // I think this should really be in the `error` method so I moved it there
+        // hadError = true;
     }
 }
