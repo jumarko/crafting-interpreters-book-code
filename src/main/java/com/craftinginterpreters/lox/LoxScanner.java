@@ -47,14 +47,32 @@ class LoxScanner {
             case '=' -> addToken(match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
             case '<' -> addToken(match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
             case '>' -> addToken(match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+            // '/' needs special handling because comments start with slash
+            case '/' -> {
+                if (match('/')) {
+                    // consume the comment content until the end of line
+                    while (peek() != '\n' && !isAtEnd()) advance();
+                } else {
+                    addToken(TokenType.SLASH);
+                }
+            }
+
             // we keep scanning even after we encounter erroneous character
             default -> Lox.error(line, "Unexpected character: " + c);
         }
     }
 
     /**
-     * `match` is like a conditional `advance` - it only consumes the current character if it's
-     * what we are looking for.
+     * Looks at the next character without consuming it.
+     */
+    private char peek() {
+        if (isAtEnd()) return '\0';
+        return source.charAt(current);
+    }
+
+    /**
+     * `match` is like a conditional `advance` - it only consumes the current character if it's what we are looking
+     * for.
      */
     private boolean match(char expected) {
         if (isAtEnd()) return false;
