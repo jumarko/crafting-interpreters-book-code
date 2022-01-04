@@ -32,6 +32,7 @@ class LoxScanner {
 
     private void scanToken() {
         char c = advance();
+        // see switch expressions enhancements: https://www.codejava.net/java-core/the-java-language/switch-expression-examples
         switch (c) {
             case '(' -> addToken(TokenType.LEFT_PAREN);
             case ')' -> addToken(TokenType.RIGHT_PAREN);
@@ -51,11 +52,15 @@ class LoxScanner {
             case '/' -> {
                 if (match('/')) {
                     // consume the comment content until the end of line
+                    // notice here we check if it's not a new line - this is to be able to increment
+                    // the line counter (see `case '\n'` below)
                     while (peek() != '\n' && !isAtEnd()) advance();
                 } else {
                     addToken(TokenType.SLASH);
                 }
             }
+            case ' ', '\r', '\t' -> {} // ignore whitespace
+            case '\n' -> line++; // ignore new lines too but also increment the line counter
 
             // we keep scanning even after we encounter erroneous character
             default -> Lox.error(line, "Unexpected character: " + c);
