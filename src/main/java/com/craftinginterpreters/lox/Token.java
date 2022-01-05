@@ -16,6 +16,7 @@ public class Token {
 
     @Override
     public String toString() {
-        return type + " " + lexeme + " " + literal;
+        // note that I use single quotes to signal that lexeme is a string
+        return type + " '" + lexeme + "' " + literal;
     }
 }

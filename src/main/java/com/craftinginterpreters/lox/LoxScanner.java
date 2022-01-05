@@ -63,9 +63,43 @@ class LoxScanner {
             case '\n' -> line++; // ignore new lines too but also increment the line counter
             case '"' -> string();
 
-            // we keep scanning even after we encounter erroneous character
-            default -> Lox.error(line, "Unexpected character: " + c);
+            // handle numbers and errors
+            default -> {
+                if (isDigit(c)) {
+                    number();
+                } else {
+                    // we keep scanning even after we encounter erroneous character
+                    Lox.error(line, "Unexpected character: " + c);
+                }
+            }
         }
+    }
+
+    private void number() {
+        // consume regular digits until the decimal point
+        while (isDigit(peek())) advance();
+
+        if (peek() == '.' && isDigit(peekNext())) {
+            advance();
+        }
+
+        // consume fractional part of decimal numbers
+        while (isDigit(peek())) advance();
+
+        addToken(TokenType.NUMBER, Double.parseDouble(source.substring(start, current)));
+    }
+
+    private char peekNext() {
+        if (source.length() > current + 1) {
+            return source.charAt(current + 1);
+        } else {
+            return '\0';
+        }
+    }
+
+    // we don't use Character.isDigit because it also supports some weird types of digits (see p. 52)
+    private boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
     }
 
     /**
